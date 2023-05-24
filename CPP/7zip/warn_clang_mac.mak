@@ -34,6 +34,9 @@ CFLAGS_WARN_MAC = \
   -Wno-poison-system-directories \
   -Wno-c++11-long-long \
   -Wno-atomic-implicit-seq-cst \
-
+  -Wno-unused-but-set-variable \
+  -Wno-strict-prototypes \
+  -Wno-declaration-after-statement \
+  -Wno-unused-but-set-parameter \
 
 CFLAGS_WARN = $(CFLAGS_WARN_CLANG_12) $(CFLAGS_WARN_MAC)
