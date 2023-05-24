@@ -38,6 +38,8 @@
 
 #include "ArchiveExtractCallback.h"
 
+#include <sys/xattr.h>
+
 using namespace NWindows;
 using namespace NFile;
 using namespace NDir;
@@ -306,6 +308,7 @@ void CArchiveExtractCallback::Init(
   ClearExtractedDirsInfo();
   _outFileStream.Release();
   _bufPtrSeqOutStream.Release();
+  _dynBufSeqOutStream.Release();
   
   #ifdef SUPPORT_LINKS
   _hardLinks.Clear();
@@ -1319,17 +1322,22 @@ HRESULT CArchiveExtractCallback::GetExtractStream(CMyComPtr<ISequentialOutStream
   }
 
   #ifdef SUPPORT_ALT_STREAMS
-  if (_item.IsAltStream && _item.ParentIndex != (UInt32)(Int32)-1)
+  if (_item.IsAltStream)
   {
-    const int renIndex = _renamedFiles.FindInSorted(CIndexToPathPair(_item.ParentIndex));
-    if (renIndex != -1)
-    {
-      const CIndexToPathPair &pair = _renamedFiles[(unsigned)renIndex];
-      fullProcessedPath = pair.Path;
-      fullProcessedPath += ':';
-      UString s (_item.AltStreamName);
-      Correct_AltStream_Name(s);
-      fullProcessedPath += us2fs(s);
+    AString attrName = GetSystemString(_item.AltStreamName);
+    if (attrName.Len() > 0 && fullProcessedPath.Len() > attrName.Len() + 1) {
+      unsigned splitColonPos = fullProcessedPath.Len() - attrName.Len() - 1;
+      if (fullProcessedPath[splitColonPos] == ':' && attrName.IsEqualTo(fullProcessedPath.GetBuf() + splitColonPos + 1)) {
+        _altStreamTargetPath = fullProcessedPath.Left(splitColonPos);
+        _altStreamName = attrName;
+
+        _dynBufSeqOutStream_Spec = new CDynBufSeqOutStream;
+        _dynBufSeqOutStream = _dynBufSeqOutStream_Spec;
+        outStreamLoc = _dynBufSeqOutStream;
+
+        needExit = false;
+        return S_OK;
+      }
     }
   }
   #endif // SUPPORT_ALT_STREAMS
@@ -1566,6 +1574,7 @@ Z7_COM7F_IMF(CArchiveExtractCallback::GetStream(UInt32 index, ISequentialOutStre
 
   _outFileStream.Release();
   _bufPtrSeqOutStream.Release();
+  _dynBufSeqOutStream.Release();
 
   _encrypted = false;
   _position = 0;
@@ -1578,6 +1587,8 @@ Z7_COM7F_IMF(CArchiveExtractCallback::GetStream(UInt32 index, ISequentialOutStre
   _index = index;
 
   _diskFilePath.Empty();
+  _altStreamTargetPath.Empty();
+  _altStreamName.Empty();
 
   _isRenamed = false;
   
@@ -2158,6 +2169,21 @@ bool CLinkInfo::Parse(const Byte *data, size_t dataSize, bool isLinuxData)
 HRESULT CArchiveExtractCallback::CloseReparseAndFile()
 {
   HRESULT res = S_OK;
+
+  if (_dynBufSeqOutStream) {
+    int ret = setxattr(
+      _altStreamTargetPath.GetBuf(), _altStreamName.GetBuf(),
+      _dynBufSeqOutStream_Spec->GetBuffer(), _dynBufSeqOutStream_Spec->GetSize(),
+      0, 0
+    );
+    if (ret != 0) {
+      res = SendMessageError_with_LastError("Cannot set extended attributes", _altStreamTargetPath);
+    }
+    _altStreamName.Empty();
+    _altStreamTargetPath.Empty();
+    _dynBufSeqOutStream.Release();
+    return res;
+  }
 
   #ifdef SUPPORT_LINKS
 

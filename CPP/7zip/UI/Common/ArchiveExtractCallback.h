@@ -322,6 +322,12 @@ class CArchiveExtractCallback Z7_final:
 
   CReadArcItem _item;
   FString _diskFilePath;
+
+  FString  _altStreamTargetPath;
+  AString  _altStreamName;
+  CDynBufSeqOutStream *_dynBufSeqOutStream_Spec;
+  CMyComPtr<ISequentialOutStream> _dynBufSeqOutStream;
+
   UInt64 _position;
 
   struct CProcessedFileInfo
