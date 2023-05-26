@@ -194,7 +194,7 @@ $(O):
 
 LFLAGS_ALL = -s $(MY_ARCH_2) $(LDFLAGS) $(LD_arch) $(OBJS) $(MY_LIBS) $(LIB2)
 $(PROGPATH): $(OBJS)
-	$(CXX) -o $(PROGPATH) $(LFLAGS_ALL)
+	$(CXX) -shared -install_name @rpath/7zz.dylib -o $(PROGPATH) $(LFLAGS_ALL)
 
 $(PROGPATH_STATIC): $(OBJS)
 	$(CXX) -static -o $(PROGPATH_STATIC) $(LFLAGS_ALL)
