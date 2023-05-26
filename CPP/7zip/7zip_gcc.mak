@@ -192,7 +192,7 @@ all: $(O) $(PROGPATH) $(STATIC_TARGET)
 $(O):
 	$(MY_MKDIR) $(O)
 
-LFLAGS_ALL = -s $(MY_ARCH_2) $(LDFLAGS) $(LD_arch) $(OBJS) $(MY_LIBS) $(LIB2)
+LFLAGS_ALL = $(MY_ARCH_2) $(LDFLAGS) $(LD_arch) $(OBJS) $(MY_LIBS) $(LIB2)
 $(PROGPATH): $(OBJS)
 	$(CXX) -shared -install_name @rpath/7zz.dylib -o $(PROGPATH) $(LFLAGS_ALL)
 
