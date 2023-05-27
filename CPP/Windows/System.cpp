@@ -64,7 +64,7 @@ UInt32 GetNumberOfProcessors()
 #else
 
 
-BOOL CProcessAffinity::Get()
+WIN_BOOL CProcessAffinity::Get()
 {
   numSysThreads = GetNumberOfProcessors();
 

@@ -177,7 +177,7 @@ static LONG TIME_GetBias()
    (ft)->dwHighDateTime = (DWORD)(v64 >> 32);
 
 
-BOOL WINAPI FileTimeToLocalFileTime(const FILETIME *fileTime, FILETIME *localFileTime)
+WIN_BOOL WINAPI FileTimeToLocalFileTime(const FILETIME *fileTime, FILETIME *localFileTime)
 {
   UInt64 v = GET_TIME_64(fileTime);
   v = (UInt64)((Int64)v - (Int64)TIME_GetBias() * TICKS_PER_SEC);
@@ -185,7 +185,7 @@ BOOL WINAPI FileTimeToLocalFileTime(const FILETIME *fileTime, FILETIME *localFil
   return TRUE;
 }
 
-BOOL WINAPI LocalFileTimeToFileTime(const FILETIME *localFileTime, FILETIME *fileTime)
+WIN_BOOL WINAPI LocalFileTimeToFileTime(const FILETIME *localFileTime, FILETIME *fileTime)
 {
   UInt64 v = GET_TIME_64(localFileTime);
   v = (UInt64)((Int64)v + (Int64)TIME_GetBias() * TICKS_PER_SEC);
@@ -226,7 +226,7 @@ DWORD WINAPI GetTickCount(VOID)
 #define PERIOD_100 (PERIOD_4 * 25 - 1)
 #define PERIOD_400 (PERIOD_100 * 4 + 1)
 
-BOOL WINAPI FileTimeToSystemTime(const FILETIME *ft, SYSTEMTIME *st)
+WIN_BOOL WINAPI FileTimeToSystemTime(const FILETIME *ft, SYSTEMTIME *st)
 {
   UInt32 v;
   UInt64 v64 = GET_TIME_64(ft);
