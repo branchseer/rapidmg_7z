@@ -62,7 +62,7 @@ struct CProcessAffinity
   UInt32 numSysThreads;
 
   UInt32 GetNumSystemThreads() const { return (UInt32)numSysThreads; }
-  BOOL Get();
+  WIN_BOOL Get();
 
   #ifdef _7ZIP_AFFINITY_SUPPORTED
 
@@ -81,7 +81,7 @@ struct CProcessAffinity
   int IsCpuSet(unsigned cpuIndex) const { return CpuSet_IsSet(&cpu_set, cpuIndex); }
   // void CpuClr(int cpuIndex) { CPU_CLR(cpuIndex, &cpu_set); }
 
-  BOOL SetProcAffinity() const
+  WIN_BOOL SetProcAffinity() const
   {
     return sched_setaffinity(0, sizeof(cpu_set), &cpu_set) == 0;
   }
@@ -108,7 +108,7 @@ struct CProcessAffinity
   void CpuSet(unsigned cpuIndex) { UNUSED_VAR(cpuIndex); }
   int IsCpuSet(unsigned cpuIndex) const { return (cpuIndex < numSysThreads) ? 1 : 0; }
 
-  BOOL SetProcAffinity() const
+  WIN_BOOL SetProcAffinity() const
   {
     errno = ENOSYS;
     return FALSE;

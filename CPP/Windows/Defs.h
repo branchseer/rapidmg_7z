@@ -10,7 +10,7 @@ inline bool LRESULTToBool(LRESULT v) { return (v != FALSE); }
 inline BOOL BoolToBOOL(bool v) { return (v ? TRUE: FALSE); }
 #endif
 
-inline bool BOOLToBool(BOOL v) { return (v != FALSE); }
+inline bool BOOLToBool(WIN_BOOL v) { return (v != FALSE); }
 
 inline VARIANT_BOOL BoolToVARIANT_BOOL(bool v) { return (v ? VARIANT_TRUE: VARIANT_FALSE); }
 inline bool VARIANT_BOOLToBool(VARIANT_BOOL v) { return (v != VARIANT_FALSE); }

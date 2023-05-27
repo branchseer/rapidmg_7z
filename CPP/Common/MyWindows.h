@@ -42,7 +42,7 @@ typedef short VARIANT_BOOL;
 
 // MS uses long for BOOL, but long is 32-bit in MS. So we use int.
 // typedef long BOOL;
-typedef int BOOL;
+typedef int WIN_BOOL;
 
 #ifndef FALSE
   #define FALSE 0
@@ -248,9 +248,9 @@ typedef struct _SYSTEMTIME
   WORD wMilliseconds;
 } SYSTEMTIME;
 
-BOOL WINAPI FileTimeToLocalFileTime(const FILETIME *fileTime, FILETIME *localFileTime);
-BOOL WINAPI LocalFileTimeToFileTime(const FILETIME *localFileTime, FILETIME *fileTime);
-BOOL WINAPI FileTimeToSystemTime(const FILETIME *fileTime, SYSTEMTIME *systemTime);
+WIN_BOOL WINAPI FileTimeToLocalFileTime(const FILETIME *fileTime, FILETIME *localFileTime);
+WIN_BOOL WINAPI LocalFileTimeToFileTime(const FILETIME *localFileTime, FILETIME *fileTime);
+WIN_BOOL WINAPI FileTimeToSystemTime(const FILETIME *fileTime, SYSTEMTIME *systemTime);
 // VOID WINAPI GetSystemTimeAsFileTime(FILETIME *systemTimeAsFileTime);
 
 DWORD GetTickCount();

@@ -830,7 +830,7 @@ bool RemoveDir(CFSTR path)
 }
 
 
-static BOOL My__CopyFile(CFSTR oldFile, CFSTR newFile)
+static WIN_BOOL My__CopyFile(CFSTR oldFile, CFSTR newFile)
 {
   NWindows::NFile::NIO::COutFile outFile;
   if (!outFile.Create(newFile, false))
