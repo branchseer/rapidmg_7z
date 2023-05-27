@@ -1,3 +1,7 @@
+.EXPORT_ALL_VARIABLES:
+
+MACOSX_DEPLOYMENT_TARGET = 10.13
+
 7zz.dylib: CPP/7zip/Bundles/Alone2/b/m_arm64/7zz CPP/7zip/Bundles/Alone2/b/m_x64/7zz
 	lipo $^ -create -output $@
 
