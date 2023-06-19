@@ -110,6 +110,7 @@ enum
   kpidGroupId,
   kpidDeviceMajor,
   kpidDeviceMinor,
+  kpidResourceFork,
 
   kpid_NUM_DEFINED,
 

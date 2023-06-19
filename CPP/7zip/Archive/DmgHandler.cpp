@@ -147,6 +147,7 @@ class CHandler:
   UInt64 _phySize;
 
   AString _name;
+  AString _resourceFork;
   
   #ifdef DMG_SHOW_RAW
   CObjectVector<CExtraFile> _extras;
@@ -267,7 +268,8 @@ static const Byte kArcProps[] =
 {
   kpidMethod,
   kpidNumBlocks,
-  kpidComment
+  kpidComment,
+  kpidResourceFork,
 };
 
 STDMETHODIMP CHandler::GetArchiveProperty(PROPID propID, PROPVARIANT *value)
@@ -356,6 +358,7 @@ STDMETHODIMP CHandler::GetArchiveProperty(PROPID propID, PROPVARIANT *value)
         prop = _name + ".dmg";
       }
       break;
+    case kpidResourceFork: prop = _resourceFork; break;
   }
   prop.Detach(value);
   return S_OK;
@@ -851,6 +854,7 @@ HRESULT CHandler::Open2(IInStream *stream)
       CObjArray<char> xmlStr(size + 1);
       RINOK(ReadStream_FALSE(stream, xmlStr, size));
       xmlStr[size] = 0;
+      _resourceFork = AString((const char *)xmlStr);
       // if (strlen(xmlStr) != size) return S_FALSE;
       if (!xml.Parse(xmlStr))
         return S_FALSE;
@@ -964,6 +968,7 @@ STDMETHODIMP CHandler::Close()
   _masterCrcError = false;
   _headersError = false;
   _name.Empty();
+  _resourceFork.Empty();
   #ifdef DMG_SHOW_RAW
   _extras.Clear();
   #endif
