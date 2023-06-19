@@ -113,5 +113,6 @@ const Byte k7z_PROPID_To_VARTYPE[kpid_NUM_DEFINED] =
   VT_UI4,
   VT_UI4,
   VT_UI4,
-  VT_UI4  // kpidDevMinor
+  VT_UI4,  // kpidDevMinor
+  VT_BSTR, // kpidResourceFork
 };

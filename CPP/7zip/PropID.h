@@ -112,6 +112,7 @@ enum
   kpidDeviceMinor,
   kpidDevMajor,
   kpidDevMinor,
+  kpidResourceFork,
 
   kpid_NUM_DEFINED,
 
