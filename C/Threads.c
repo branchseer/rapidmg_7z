@@ -371,10 +371,11 @@ WRes AutoResetEvent_CreateNotSignaled(CAutoResetEvent *p)
 
 WRes Event_Set(CEvent *p)
 {
+  int res1, res2;
   RINOK(pthread_mutex_lock(&p->_mutex))
   p->_state = True;
-  int res1 = pthread_cond_broadcast(&p->_cond);
-  int res2 = pthread_mutex_unlock(&p->_mutex);
+  res1 = pthread_cond_broadcast(&p->_cond);
+  res2 = pthread_mutex_unlock(&p->_mutex);
   return (res2 ? res2 : res1);
 }
 

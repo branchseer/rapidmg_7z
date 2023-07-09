@@ -287,7 +287,10 @@ HRESULT CDirItems::EnumerateOneDir(const FString &phyPrefix, CObjectVector<NFind
   
   CObjectVector<NFind::CDirEntry> entries;
 
+#pragma clang diagnostic push
+#pragma clang diagnostic ignored "-Wunused-but-set-variable"
   for (unsigned ttt = 0; ; ttt++)
+#pragma clang diagnostic pop
   {
     bool found;
     NFind::CDirEntry de;
