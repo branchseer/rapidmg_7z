@@ -1327,7 +1327,7 @@ HRESULT CArchiveExtractCallback::GetExtractStream(CMyComPtr<ISequentialOutStream
     AString attrName = GetSystemString(_item.AltStreamName);
     if (attrName.Len() > 0 && fullProcessedPath.Len() > attrName.Len() + 1) {
       unsigned splitColonPos = fullProcessedPath.Len() - attrName.Len() - 1;
-      if (fullProcessedPath[splitColonPos] == ':' && attrName.IsEqualTo(fullProcessedPath.GetBuf() + splitColonPos + 1)) {
+      if (fullProcessedPath[splitColonPos] == ':') {
         _altStreamTargetPath = fullProcessedPath.Left(splitColonPos);
         _altStreamName = attrName;
 
