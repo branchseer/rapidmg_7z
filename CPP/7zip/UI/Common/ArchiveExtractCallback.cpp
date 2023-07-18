@@ -2171,13 +2171,15 @@ HRESULT CArchiveExtractCallback::CloseReparseAndFile()
   HRESULT res = S_OK;
 
   if (_dynBufSeqOutStream) {
-    int ret = setxattr(
-      _altStreamTargetPath.GetBuf(), _altStreamName.GetBuf(),
-      _dynBufSeqOutStream_Spec->GetBuffer(), _dynBufSeqOutStream_Spec->GetSize(),
-      0, 0
-    );
-    if (ret != 0) {
-      res = SendMessageError_with_LastError("Cannot set extended attributes", _altStreamTargetPath);
+    if (_altStreamName != "com.apple.quarantine") {
+      int ret = setxattr(
+        _altStreamTargetPath.GetBuf(), _altStreamName.GetBuf(),
+        _dynBufSeqOutStream_Spec->GetBuffer(), _dynBufSeqOutStream_Spec->GetSize(),
+        0, 0
+      );
+      if (ret != 0) {
+        res = SendMessageError_with_LastError("Cannot set extended attributes", _altStreamTargetPath);
+      }
     }
     _altStreamName.Empty();
     _altStreamTargetPath.Empty();
