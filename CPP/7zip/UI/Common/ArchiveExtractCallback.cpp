@@ -1974,7 +1974,7 @@ HRESULT CArchiveExtractCallback::SetFromLinkPath(
     relatPath = GetDirPrefixOf(_item.Path);
   relatPath += linkInfo.linkPath;
   
-  if (!IsSafePath(relatPath))
+  if (!_ntOptions.AllowDangerousLinkPath && !IsSafePath(relatPath))
   {
     return SendMessageError2(
           0, // errorCode
@@ -2045,7 +2045,6 @@ HRESULT CArchiveExtractCallback::SetFromLinkPath(
     // convertToAbs = true;
   }
   */
-
   if (!_ntOptions.SymLinks_AllowDangerous.Val)
   {
     #ifdef _WIN32

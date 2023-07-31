@@ -64,6 +64,7 @@ struct CExtractNtOptions
 
   // used for hash arcs only, when we open external files
   bool PreserveATime;
+  bool AllowDangerousLinkPath;
   bool OpenShareForWrite;
 
   CExtractNtOptions():
@@ -71,6 +72,7 @@ struct CExtractNtOptions
       WriteToAltStreamIfColon(false),
       ExtractOwner(false),
       PreserveATime(false),
+      AllowDangerousLinkPath(false),
       OpenShareForWrite(false)
   {
     SymLinks.Val = true;
