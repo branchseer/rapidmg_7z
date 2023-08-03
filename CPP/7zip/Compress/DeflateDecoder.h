@@ -110,7 +110,9 @@ private:
   HRESULT CodeSpec(UInt32 curSize, bool finishInputStream, UInt32 inputProgressLimit = 0);
 public:
   bool ZlibMode;
+  bool AllowNoAdler = false;
   Byte ZlibFooter[4];
+  bool ZlibFooterExists = false;
 
   CCoder(bool deflate64Mode);
   virtual ~CCoder() {}
@@ -123,7 +125,7 @@ public:
   bool IsFinished() const { return _remainLen == kLenIdFinished; }
   bool IsFinalBlock() const { return m_FinalBlock; }
 
-  HRESULT CodeReal(ISequentialOutStream *outStream, ICompressProgressInfo *progress);
+  HRESULT CodeReal(ISequentialOutStream *outStream, ICompressProgressInfo *progress, const UInt64* size);
 
 public:
   HRESULT CodeResume(ISequentialOutStream *outStream, const UInt64 *outSize, ICompressProgressInfo *progress);

@@ -1789,6 +1789,7 @@ static const UInt32 kCompressionBlockSize = 1 << 16;
 CDecoder::CDecoder()
 {
   _zlibDecoderSpec = new NCompress::NZlib::CDecoder();
+  _zlibDecoderSpec->AllowNoAdler = true;
   _zlibDecoder = _zlibDecoderSpec;
   
   _lzfseDecoderSpec = new NCompress::NLzfse::CDecoder();
@@ -1900,7 +1901,8 @@ HRESULT CDecoder::ExtractResourceFork_ZLIB(
     {
       const UInt64 blockSize64 = blockSize;
       bufInStreamSpec->Init(buf, size);
-      RINOK(_zlibDecoder->Code(bufInStream, outStream, NULL, &blockSize64, NULL))
+      const UInt64 size64 = size;
+      RINOK(_zlibDecoder->Code(bufInStream, outStream, &size64, &blockSize64, NULL))
       if (_zlibDecoderSpec->GetOutputProcessedSize() != blockSize)
         return S_FALSE;
       const UInt64 inSize = _zlibDecoderSpec->GetInputProcessedSize();

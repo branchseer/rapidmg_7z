@@ -61,6 +61,7 @@ Z7_COM7F_IMF(CDecoder::Code(ISequentialInStream *inStream, ISequentialOutStream 
   {
     DeflateDecoderSpec = new NDeflate::NDecoder::CCOMCoder;
     DeflateDecoderSpec->ZlibMode = true;
+    DeflateDecoderSpec->AllowNoAdler = AllowNoAdler;
     DeflateDecoder = DeflateDecoderSpec;
   }
 
@@ -83,6 +84,9 @@ Z7_COM7F_IMF(CDecoder::Code(ISequentialInStream *inStream, ISequentialOutStream 
 
   if (res == S_OK)
   {
+    if (!DeflateDecoderSpec->ZlibFooterExists && AllowNoAdler) {
+      return S_OK;
+    }
     const Byte *p = DeflateDecoderSpec->ZlibFooter;
     const UInt32 adler = GetBe32(p);
     if (adler != AdlerSpec->GetAdler())

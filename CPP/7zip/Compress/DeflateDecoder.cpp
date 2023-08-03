@@ -332,7 +332,7 @@ HRESULT CCoder::CodeSpec(UInt32 curSize, bool finishInputStream, UInt32 inputPro
 #endif
 
 
-HRESULT CCoder::CodeReal(ISequentialOutStream *outStream, ICompressProgressInfo *progress)
+HRESULT CCoder::CodeReal(ISequentialOutStream *outStream, ICompressProgressInfo *progress, const UInt64* size)
 {
   HRESULT res;
   
@@ -373,14 +373,22 @@ HRESULT CCoder::CodeReal(ISequentialOutStream *outStream, ICompressProgressInfo 
       RINOK(progress->SetRatioInfo(&inSize, &nowPos64))
     }
   }
-  
+
+  ZlibFooterExists = false;
   if (_remainLen == kLenIdFinished && ZlibMode)
   {
     m_InBitStream.AlignToByte();
-    for (unsigned i = 0; i < 4; i++)
-      ZlibFooter[i] = ReadAlignedByte();
+    bool checksAdlter = true;
+    if (AllowNoAdler && size != NULL && (*size - m_InBitStream.GetProcessedSize()) < 4) {
+      checksAdlter = false;
+    }
+    if (checksAdlter) {
+      for (unsigned i = 0; i < 4; i++)
+        ZlibFooter[i] = ReadAlignedByte();
+      ZlibFooterExists = true;
+    }
   }
-  
+
   flusher.NeedFlush = false;
   res = Flush();
   if (res == S_OK && _remainLen != kLenIdNeedInit && InputEofError())
@@ -393,11 +401,11 @@ HRESULT CCoder::CodeReal(ISequentialOutStream *outStream, ICompressProgressInfo 
 
 
 Z7_COM7F_IMF(CCoder::Code(ISequentialInStream *inStream, ISequentialOutStream *outStream,
-    const UInt64 * /* inSize */, const UInt64 *outSize, ICompressProgressInfo *progress))
+    const UInt64 *inSize, const UInt64 *outSize, ICompressProgressInfo *progress))
 {
   SetInStream(inStream);
   SetOutStreamSize(outSize);
-  const HRESULT res = CodeReal(outStream, progress);
+  const HRESULT res = CodeReal(outStream, progress, inSize);
   ReleaseInStream();
   /*
   if (res == S_OK)
@@ -535,7 +543,7 @@ Z7_COM7F_IMF(CCoder::Read(void *data, UInt32 size, UInt32 *processedSize))
 HRESULT CCoder::CodeResume(ISequentialOutStream *outStream, const UInt64 *outSize, ICompressProgressInfo *progress)
 {
   SetOutStreamSizeResume(outSize);
-  return CodeReal(outStream, progress);
+  return CodeReal(outStream, progress, NULL);
 }
 
 }}}

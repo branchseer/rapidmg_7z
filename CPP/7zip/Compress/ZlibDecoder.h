@@ -34,6 +34,7 @@ Z7_CLASS_IMP_NOQIB_1(
   NCompress::NDeflate::NDecoder::CCOMCoder *DeflateDecoderSpec;
   CMyComPtr<ICompressCoder> DeflateDecoder;
 public:
+  bool AllowNoAdler = false;
   UInt64 GetInputProcessedSize() const { return DeflateDecoderSpec->GetInputProcessedSize() + 2; }
   UInt64 GetOutputProcessedSize() const { return AdlerSpec->GetSize(); }
 };
