@@ -21,6 +21,7 @@
 #include "../Compress/CopyCoder.h"
 #include "../Compress/LzfseDecoder.h"
 #include "../Compress/ZlibDecoder.h"
+#include "../Compress/XzDecoder.h"
 
 #include "Common/OutStreamWithCRC.h"
 
@@ -46,6 +47,7 @@ static const UInt32  METHOD_ADC     = 0x80000004;
 static const UInt32  METHOD_ZLIB    = 0x80000005;
 static const UInt32  METHOD_BZIP2   = 0x80000006;
 static const UInt32  METHOD_LZFSE   = 0x80000007;
+static const UInt32  METHOD_LZMA    = 0x80000008;
 static const UInt32  METHOD_COMMENT = 0x7FFFFFFE; // is used to comment "+beg" and "+end" in extra field.
 static const UInt32  METHOD_END     = 0xFFFFFFFF;
 
@@ -198,6 +200,7 @@ void CMethods::GetString(AString &res) const
       case METHOD_ZLIB:   s = "ZLIB";  break;
       case METHOD_BZIP2:  s = "BZip2"; break;
       case METHOD_LZFSE:  s = "LZFSE"; break;
+      case METHOD_LZMA:   s = "LZMA"; break;
       default: ConvertUInt32ToString(type, buf); s = buf;
     }
     res.Add_OptSpaced(s);
@@ -1286,6 +1289,9 @@ Z7_COM7F_IMF(CHandler::Extract(const UInt32 *indices, UInt32 numItems,
   NCompress::NLzfse::CDecoder *lzfseCoderSpec = new NCompress::NLzfse::CDecoder();
   CMyComPtr<ICompressCoder> lzfseCoder = lzfseCoderSpec;
 
+  NCompress::NXz::CComDecoder *lzmaCoderSpec = new NCompress::NXz::CComDecoder();
+  CMyComPtr<ICompressCoder> lzmaCoder = lzmaCoderSpec;
+
   CLocalProgress *lps = new CLocalProgress;
   CMyComPtr<ICompressProgressInfo> progress = lps;
   lps->Init(extractCallback, false);
@@ -1419,7 +1425,13 @@ Z7_COM7F_IMF(CHandler::Extract(const UInt32 *indices, UInt32 numItems,
               res = lzfseCoder->Code(inStream, outStream, &block.PackSize, &block.UnpSize, progress);
               break;
             }
-            
+
+            case METHOD_LZMA:
+            {
+              res = lzmaCoder->Code(inStream, outStream, &block.PackSize, &block.UnpSize, progress);
+              break;
+            }
+
             default:
               opRes = NExtract::NOperationResult::kUnsupportedMethod;
               break;
@@ -1495,6 +1507,9 @@ Z7_CLASS_IMP_COM_1(
 
   NCompress::NLzfse::CDecoder *lzfseCoderSpec;
   CMyComPtr<ICompressCoder> lzfseCoder;
+
+  NCompress::NXz::CComDecoder *lzmaCoderSpec;
+  CMyComPtr<ICompressCoder> lzmaCoder;
 
   CBufPtrSeqOutStream *outStreamSpec;
   CMyComPtr<ISequentialOutStream> outStream;
@@ -1661,7 +1676,16 @@ Z7_COM7F_IMF(CInStream::Read(void *data, UInt32 size, UInt32 *processedSize))
             }
             res = lzfseCoder->Code(inStream, outStream, &block.PackSize, &block.UnpSize, NULL);
             break;
-            
+
+          case METHOD_LZMA:
+            if (!lzmaCoder)
+            {
+              lzmaCoderSpec = new NCompress::NXz::CComDecoder();
+              lzmaCoder = lzmaCoderSpec;
+            }
+            res = lzmaCoder->Code(inStream, outStream, &block.PackSize, &block.UnpSize, NULL);
+            break;
+
           default:
             return E_FAIL;
         }
@@ -1749,6 +1773,7 @@ Z7_COM7F_IMF(CHandler::GetStream(UInt32 index, ISequentialInStream **stream))
       case METHOD_ZLIB:
       case METHOD_BZIP2:
       case METHOD_LZFSE:
+      case METHOD_LZMA:
       case METHOD_END:
         break;
       default:
